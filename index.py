@@ -7,6 +7,13 @@ import json
 import pandas as pd
 import re
 
+import panel as pn
+pn.extension('tabulator', sizing_mode="stretch_width")
+import hvplot.pandas
+from bokeh.models.widgets.tables import NumberFormatter
+import datetime as dt
+import numpy as np 
+
 # Entering the league's  link
 link = "https://understat.com/league/epl"
 res = requests.get(link)
@@ -28,14 +35,6 @@ players['position_main'] = players['position'].str.split(' ').str[0]
 #-----------------------------------------------
 # SHOTS
 #-----------------------------------------------
-import pandas as pd 
-import panel as pn
-pn.extension('tabulator', sizing_mode="stretch_width")
-import hvplot.pandas
-from bokeh.models.widgets.tables import NumberFormatter
-import datetime as dt
-import numpy as np    
-
 df = pd.read_csv('https://raw.githubusercontent.com/ArchedEnemy/EPL/main/shots23.csv', parse_dates = ['date'], dayfirst=True)
 #df = pd.read_csv(r'X:\understat23.csv', parse_dates = ['date'], dayfirst=True)
 df['own_goal'] =  np.where(df['result'] == 'OwnGoal', 1, 0)
@@ -87,6 +86,6 @@ def input_function1(team, position):
         #,'position_main': {'type': 'input', 'func': 'like', 'placeholder': 'position'}
     }
     
-    return pn.widgets.Tabulator(df5, frozen_columns=['player'], formatters=bokeh_formatters, page_size=20, show_index=False, header_filters=col_filters)
-
+    return pn.widgets.Tabulator(df5, frozen_columns=['player','team'], pagination='local', formatters=bokeh_formatters, page_size=10, show_index=False, header_filters=col_filters)
+  
 pn.Column(pn.Row(positions,teams), hvplot.bind(input_function1, teams, positions)).servable()
